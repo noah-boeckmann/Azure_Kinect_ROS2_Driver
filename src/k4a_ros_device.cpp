@@ -13,7 +13,7 @@
 // Library headers
 //
 #include <angles/angles.h>
-#include <cv_bridge/cv_bridge.h>
+#include <cv_bridge/cv_bridge.hpp>
 #include <k4a/k4a.hpp>
 
 //#include <sensor_msgs/distortion_models.hpp>
