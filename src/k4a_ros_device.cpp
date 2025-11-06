@@ -256,7 +256,7 @@ K4AROS2Device::K4AROS2Device()
   qos_.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
   qos_.durability(RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL);
 
-  std::string topic_prefix = "k4a/";
+  std::string topic_prefix = this->get_parameter("tf_prefix").value_to_string();
 
 
   // Register our topics
