@@ -253,7 +253,7 @@ K4AROS2Device::K4AROS2Device()
 
   // TODO: QoS Params
   qos_.history(RMW_QOS_POLICY_HISTORY_KEEP_LAST);
-  qos_.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
+  qos_.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
   qos_.durability(RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL);
 
   std::string topic_prefix = this->get_parameter("tf_prefix").value_to_string();
@@ -270,10 +270,10 @@ K4AROS2Device::K4AROS2Device()
     // I guess CompressedImage cannot use CameraPublisher. It needs its own separate publishers for the image
     // and the camera_info. https://answers.ros.org/question/385599/how-to-publish-a-compressedimage-in-ros2-foxy/
     rgb_jpeg_publisher_ = this->create_publisher<sensor_msgs::msg::CompressedImage>(
-        "rgb/image_raw/compressed", qos_);
+        topic_prefix + "rgb/image_raw/compressed", qos_);
 
     rgb_cam_info_jpeg_publisher_ = this->create_publisher<sensor_msgs::msg::CameraInfo>(
-        "rgb/camera_info", qos_);
+        topic_prefix + "rgb/camera_info", qos_);
 
     RCLCPP_INFO_STREAM(this->get_logger(),
                        "Advertised on topic: " << rgb_jpeg_publisher_->get_topic_name());
@@ -851,8 +851,8 @@ void K4AROS2Device::framePublisherThread()
     }
 
     // Instantiate messages to be published
-    std::shared_ptr<sensor_msgs::msg::CompressedImage> rgb_jpeg_frame =
-        std::shared_ptr<sensor_msgs::msg::CompressedImage>();
+    // std::shared_ptr<sensor_msgs::msg::CompressedImage> rgb_jpeg_frame =
+    //     std::shared_ptr<sensor_msgs::msg::CompressedImage>();
 
     std::shared_ptr<sensor_msgs::msg::Image> ir_raw_frame =
         std::make_shared<sensor_msgs::msg::Image>();
@@ -982,6 +982,7 @@ void K4AROS2Device::framePublisherThread()
         if (rgb_jpeg_publisher_->get_subscription_count()  > 0 &&
             (k4a_device_ || capture.get_color_image() != nullptr))
         {
+          auto rgb_jpeg_frame = std::make_shared<sensor_msgs::msg::CompressedImage>();
           result = getJpegRgbFrame(capture, rgb_jpeg_frame);
 
           if (result != K4A_RESULT_SUCCEEDED)
